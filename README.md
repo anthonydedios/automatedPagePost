@@ -74,20 +74,47 @@ Edit `posts/queue.json` and add one object per item you want posted, e.g.:
 ```json
 {
   "id": "item-002",
-  "caption": "Denim jacket, size M, PHP 650. DM to order! #ContactClosetDeEmilia",
-  "image_url": "https://your-image-host.com/jacket.jpg",
+  "name": "Denim Jacket",
+  "price": "PHP 650",
+  "description": "Oversized fit, great for layering, size M",
+  "image_urls": [
+    "https://your-image-host.com/jacket-front.jpg",
+    "https://your-image-host.com/jacket-back.jpg"
+  ],
   "active": true,
   "last_posted_at": null,
   "times_posted": 0
 }
 ```
 
-`image_url` must be a **publicly reachable** image URL (Imgur, your own
-hosting, GitHub raw file link, etc.) - Facebook fetches the image from that
-URL directly.
+Fill in `name`, `price`, and `description` per item - that's what
+`scripts/caption_engine.py` uses to write a fresh, differently-worded caption
+**every time the item is posted**, instead of reusing one static line. If you
+leave those blank, it falls back to wrapping whatever is in the old
+`caption` field with a random opener/CTA/hashtags instead, but you'll get
+noticeably better, more natural-sounding results by filling in the three
+fields above per item.
 
-The workflow always posts whichever active item was posted longest ago (or
-never), so it rotates through your whole queue automatically.
+`image_urls` is a **list** - put one or more image URLs per item:
+
+- **One item you have several photos of** (front/back/detail shots of the
+  same piece of clothing) -> list all of them under one entry's
+  `image_urls`. They'll go out together as a single multi-photo Facebook
+  post (like a swipeable album), not as separate posts.
+- **A single photo** -> just a one-item list.
+
+Each URL must be **publicly reachable** (Imgur, your own hosting, a GitHub
+raw file link, etc.) - Facebook fetches the image from that URL directly.
+
+### Posting order
+
+`pick_next_item()` in `scripts/post_to_facebook.py` sorts active items by
+how long ago they were posted (never-posted items count as oldest), then
+picks randomly from among the stalest `SHUFFLE_POOL_SIZE` (default 8) of
+them. That keeps the whole catalog cycling through fairly while avoiding a
+robotic, always-the-same-order feed - so the same 2-3 items don't end up
+posting back-to-back in a predictable pattern. Adjust `SHUFFLE_POOL_SIZE` at
+the top of that file if you want a wider or narrower randomization window.
 
 ## 6. Test it
 
