@@ -69,7 +69,10 @@ In your repo: **Settings > Secrets and variables > Actions > New repository secr
 
 ## 5. Fill in your real posts
 
-Edit `posts/queue.json` and add one object per item you want posted, e.g.:
+Edit `posts/queue.json` - it's your whole active catalog. **Every run posts
+ALL active items together, as one single Facebook post** with every photo
+attached (Facebook's multi-photo/album post format), in shuffled order.
+Add one object per product you're selling, e.g.:
 
 ```json
 {
@@ -87,34 +90,45 @@ Edit `posts/queue.json` and add one object per item you want posted, e.g.:
 }
 ```
 
-Fill in `name`, `price`, and `description` per item - that's what
-`scripts/caption_engine.py` uses to write a fresh, differently-worded caption
-**every time the item is posted**, instead of reusing one static line. If you
-leave those blank, it falls back to wrapping whatever is in the old
-`caption` field with a random opener/CTA/hashtags instead, but you'll get
-noticeably better, more natural-sounding results by filling in the three
-fields above per item.
+Fill in `name`, `price`, and `description` per item - `scripts/caption_engine.py`
+uses those to write a fresh, differently-worded caption **for that item's
+photo(s) individually**, every run. If you leave those blank, it falls back
+to wrapping the old `caption` field with randomized phrasing instead.
 
-`image_urls` is a **list** - put one or more image URLs per item:
-
-- **One item you have several photos of** (front/back/detail shots of the
-  same piece of clothing) -> list all of them under one entry's
-  `image_urls`. They'll go out together as a single multi-photo Facebook
-  post (like a swipeable album), not as separate posts.
-- **A single photo** -> just a one-item list.
+`image_urls` is a **list** - if you have several photos of the *same*
+product (front/back/detail shots), put them all under that one item's list.
+If a photo doesn't clearly show a product on its own (has no obvious front
+shot, etc.), just leave it as its own single-photo item.
 
 Each URL must be **publicly reachable** (Imgur, your own hosting, a GitHub
 raw file link, etc.) - Facebook fetches the image from that URL directly.
 
-### Posting order
+### How one run works
 
-`pick_next_item()` in `scripts/post_to_facebook.py` sorts active items by
-how long ago they were posted (never-posted items count as oldest), then
-picks randomly from among the stalest `SHUFFLE_POOL_SIZE` (default 8) of
-them. That keeps the whole catalog cycling through fairly while avoiding a
-robotic, always-the-same-order feed - so the same 2-3 items don't end up
-posting back-to-back in a predictable pattern. Adjust `SHUFFLE_POOL_SIZE` at
-the top of that file if you want a wider or narrower randomization window.
+`scripts/post_to_facebook.py` does the following each time it runs:
+
+1. Collects every photo from every `"active": true` item, shuffles the
+   order.
+2. Uploads each photo to the Page as "unpublished" (not visible yet), each
+   with its own randomized caption built from that item's `name`/`price`/
+   `description`.
+3. Creates **one** feed post attaching all of those photos together, with a
+   single overall randomized caption on top (a "new arrivals" style intro +
+   CTA + hashtags).
+4. Marks every included item's `last_posted_at`/`times_posted` in the queue.
+
+**Two things to be aware of with this "everything in one post" approach:**
+
+- **Facebook may cap how many photos one post can hold.** There's no
+  guaranteed number - if the API rejects the request for having too many
+  attached photos, you'll see the error in the Actions run log, and you'll
+  need to split your catalog across a few smaller `queue.json`-driven runs
+  instead of one giant one.
+- **The cron schedule still runs hourly** (`.github/workflows/facebook-auto-post.yml`).
+  Since every run now posts your *entire* active catalog as one post, an
+  hourly schedule means a near-duplicate 56-photo post every hour. You'll
+  likely want to change the cron to something much less frequent (daily or
+  a few times a week) - edit the `cron:` line in the workflow file.
 
 ## 6. Test it
 

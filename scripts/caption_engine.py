@@ -80,6 +80,25 @@ CTAS = [
     "Available na for order, DM lang po",
 ]
 
+BATCH_OPENERS = [
+    "New batch of arrivals! 🛍️",
+    "Okay, todo drop na ngayong araw ✨",
+    "Swipe through our latest finds 👉",
+    "Fresh haul, fresh picks for you 👗",
+    "Sino may gusto ng bago? Sulit lineup 'to 👇",
+    "Ang dami naming bago ngayon, i-check niyo 'to",
+    "Restock + new arrivals, all in one post 🙌",
+    "Todo ganda ang lineup namin ngayon",
+]
+
+BATCH_CTAS = [
+    "Comment the item name or number you like, or DM us to order 💌",
+    "Swipe, pick your fave, then message us to claim it 🙌",
+    "Tell us which one's yours - first to message gets it!",
+    "DM us with the item you want and we'll take it from there 💬",
+    "Order na bago maubos ang mga paborito 👀",
+]
+
 HASHTAG_POOL = [
     "#ContactClosetDeEmilia", "#OOTD", "#ClothingPH", "#AffordableFashionPH",
     "#ClosetSale", "#StyleFinds", "#PreLovedOrNew", "#FashionDeals",
@@ -163,3 +182,30 @@ def generate_caption(item):
     _last_signature[item_id] = caption
 
     return caption
+
+
+def generate_batch_caption(items):
+    """
+    Build the single top-level caption for a post that bundles many items'
+    photos together. Individual per-item detail (name/price/description)
+    goes on each photo's own caption instead (see generate_caption) - this
+    is just the overall intro + CTA shown on the post itself.
+    """
+    parts = [random.choice(BATCH_OPENERS)]
+
+    names = [i.get("name", "").strip() for i in items if i.get("name", "").strip()]
+    if names:
+        shown = names[:6]
+        line = "Featuring: " + ", ".join(shown)
+        if len(names) > len(shown):
+            line += f", and {len(names) - len(shown)} more"
+        parts.append(line)
+
+    parts.append(random.choice(BATCH_CTAS))
+
+    if random.random() < 0.85:
+        tag_count = random.randint(2, 4)
+        tags = " ".join(random.sample(HASHTAG_POOL, k=min(tag_count, len(HASHTAG_POOL))))
+        parts.append(tags)
+
+    return "\n".join(parts)
