@@ -1,6 +1,6 @@
-# Contact Closet De Emilia - Facebook Page Auto Poster
+# Closet De Emilia - Facebook Page Auto Poster
 
-Automatically posts items from `posts/queue.json` to your **own Facebook Page**
+Automatically posts items from `posts/queue.json` to Closet De Emilia
 on a schedule, using GitHub Actions + the Facebook Graph API.
 
 This does **not** and cannot post into Facebook Groups you don't administer -
