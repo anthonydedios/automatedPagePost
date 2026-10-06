@@ -52,34 +52,47 @@ Stall 19
 Delivery:
 Lalamove, LBC or J&T
 
-#taytay #tiangge #taytaytianggeph #taytaytianggesupplier #ternoset #terno #ternoshorts #taytaymanufacturer #challisprinted #challis #rtw #bagpipesofinstagram #Duster"""
+#taytay #tiangge #duster #taytaytianggeph #taytaytianggesupplier #ternoset #terno #ternoshorts #taytaymanufacturer #challisprinted #challis #rtw #bagpipesofinstagram #Duster"""
 
 TERNOSLEEVE_CAPTION = """NEW Terno | 150 php | Freesize | Challis Korean
+
 Warehouse Location:
 Tatala Binangonan Rizal (Near AlfaMart Tatala)
+
 Store Locations:
+
 - All Star Taytay Tiangge
 Stall 97 and 98
+
 - Binangonan Tiangge
-Stall A-10, B-10
+Stall 19
+
 - Tanay Tiangge
+
 Delivery:
 Lalamove, LBC or J&T
-#taytay #tiangge #taytaytianggeph #taytaytianggesupplier #ternoset #terno #ternoshorts #taytaymanufacturer #challisprinted #challis #rtw #bagpipesofinstagram #Duster"""
+
+#taytay #ternosleeves #tiangge #taytaytianggeph #taytaytianggesupplier #ternoset #terno #ternoshorts #taytaymanufacturer #challisprinted #challis #rtw #bagpipesofinstagram #Duster"""
 
 SMOCKDRESS_CAPTION = """NEW SMOCKED DRESS | Freesize | Challis Korean
 
 Warehouse Location:
 Tatala Binangonan Rizal (Near AlfaMart Tatala)
+
 Store Locations:
+
 - All Star Taytay Tiangge
 Stall 97 and 98
+
 - Binangonan Tiangge
-Stall A-10, B-10
+Stall 19
+
 - Tanay Tiangge
+
 Delivery:
 Lalamove, LBC or J&T
-#taytay #tiangge #taytaytianggeph #taytaytianggesupplier #ternoset #terno #ternoshorts #taytaymanufacturer #challisprinted #challis #rtw #bagpipesofinstagram #Duster"""
+
+#taytay #tiangge #smockdress #dress #taytaytianggeph #taytaytianggesupplier #ternoset #terno #ternoshorts #taytaymanufacturer #challisprinted #challis #rtw #bagpipesofinstagram #Duster"""
 
 # Rotation order - add/reorder entries here to change the cycle.
 PRODUCTS = [
