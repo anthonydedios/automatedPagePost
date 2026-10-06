@@ -32,7 +32,7 @@ import requests
 GRAPH_API_VERSION = "v20.0"
 STATE_PATH = "posts/rotation_state.json"
 ALLOWED_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp"}
-MAX_PHOTOS_PER_POST = 4  # Facebook's hard cap for attached_media in one feed post
+MAX_PHOTOS_PER_POST = 20  # Facebook's hard cap for attached_media in one feed post
 
 DUSTER_CAPTION = """NEW Duster Sleeve | 180 php | Freesize | Challis Korean
 
