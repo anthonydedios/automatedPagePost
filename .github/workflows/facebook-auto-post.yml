@@ -2,8 +2,8 @@ name: Facebook Page Auto Poster
 
 on:
   schedule:
-    # Runs every 23 hours (adjust the cron if you want a different cadence)
-    - cron: '0 */23 * * *'
+    # Runs every 12 hours (adjust the cron if you want a different cadence)
+    - cron: '0 */12 * * *'
   workflow_dispatch: {}   # lets you trigger it manually from the Actions tab
 
 permissions:
