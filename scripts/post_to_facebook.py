@@ -45,7 +45,7 @@ Store Locations:
 Stall 97 and 98
 
 - Binangonan Tiangge
-Stall 19
+Stall A-10 and B-10
 
 - Tanay Tiangge
 
@@ -65,7 +65,7 @@ Store Locations:
 Stall 97 and 98
 
 - Binangonan Tiangge
-Stall 19
+Stall A-10 and B-10
 
 - Tanay Tiangge
 
@@ -85,7 +85,7 @@ Store Locations:
 Stall 97 and 98
 
 - Binangonan Tiangge
-Stall 19
+Stall A-10 and B-10
 
 - Tanay Tiangge
 
