@@ -1,143 +1,130 @@
 """
-Posts ALL active items in posts/queue.json to your Facebook Page as ONE
-single multi-photo post (every photo across every active item, bundled
-together, in randomized order).
+Posts a random selection of photos from a local folder to your Facebook
+Page as ONE multi-photo post, with a fixed caption used every time.
 
-How it works, per Facebook Graph API mechanics:
-  1. Every photo from every active item is uploaded as an "unpublished"
-     photo (published=false) - each upload can carry its own caption, built
-     from that item's name/price/description via caption_engine.
-  2. One feed post is then created that attaches all of those uploaded
-     photo ids together (attached_media), with a single overall caption
-     (caption_engine.generate_batch_caption) as the post's message.
-  3. Every item that contributed a photo has its last_posted_at/times_posted
-     updated in the queue file.
-
-Note: Facebook may enforce an undocumented practical limit on how many
-photos can be attached to a single post. If you have a large catalog and
-the API rejects the request, check the run's error output - you may need
-to split posting into smaller batches.
+How it works:
+  1. Every image file inside PHOTOS_DIR is uploaded to Facebook as an
+     "unpublished" photo (published=false), sent as actual file bytes
+     (not a URL) - this works for local repo files.
+  2. The order the photos are uploaded/attached in is shuffled randomly
+     on every run, so the post doesn't look identical each time.
+  3. One feed post is created attaching all of those uploaded photos,
+     with STATIC_CAPTION as the post's message - every run uses the
+     exact same caption text.
 
 Required environment variables (set as GitHub Secrets):
   FB_PAGE_ID             - your Facebook Page's numeric ID
   FB_PAGE_ACCESS_TOKEN   - a long-lived Page access token
+
+Optional environment variable:
+  PHOTOS_DIR             - overrides which local folder to post from
+                            (defaults to photos/duster)
 """
 
-import json
+import mimetypes
 import os
 import random
 import sys
-from datetime import datetime, timezone
 
 import requests
 
-from caption_engine import generate_caption, generate_batch_caption
-
-QUEUE_PATH = "posts/queue.json"
 GRAPH_API_VERSION = "v20.0"
+DEFAULT_PHOTOS_DIR = "photos/duster"
+ALLOWED_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp"}
+
+STATIC_CAPTION = """NEW Duster Sleeve | 180 php | Freesize | Challis Korean
+
+Warehouse Location:
+Tatala Binangonan Rizal (Near AlfaMart Tatala)
+
+Store Locations:
+
+- All Star Taytay Tiangge
+Stall 97 and 98
+
+- Binangonan Tiangge
+Stall 19
+
+- Tanay Tiangge
+
+Delivery:
+Lalamove, LBC or J&T
+
+#taytay #tiangge #taytaytianggeph #taytaytianggesupplier #ternoset #terno #ternoshorts #taytaymanufacturer #challisprinted #challis #rtw #bagpipesofinstagram #Duster"""
 
 
-def load_queue():
-    with open(QUEUE_PATH, "r", encoding="utf-8") as f:
-        return json.load(f)
+def list_photos(photos_dir):
+    if not os.path.isdir(photos_dir):
+        print(f"Photos folder not found: {photos_dir}", file=sys.stderr)
+        sys.exit(1)
+
+    files = [
+        os.path.join(photos_dir, f)
+        for f in os.listdir(photos_dir)
+        if os.path.splitext(f)[1].lower() in ALLOWED_EXTENSIONS
+    ]
+    random.shuffle(files)
+    return files
 
 
-def save_queue(queue):
-    with open(QUEUE_PATH, "w", encoding="utf-8") as f:
-        json.dump(queue, f, indent=2, ensure_ascii=False)
-
-
-def _get_image_urls(item):
-    urls = item.get("image_urls")
-    if urls:
-        return [u for u in urls if u]
-    legacy = item.get("image_url")  # backward compat
-    return [legacy] if legacy else []
-
-
-def build_photo_list(queue):
-    """
-    Flattens every active item's photos into a single (item, url) list and
-    shuffles it, so the order photos appear in the post isn't the same
-    every run and isn't grouped strictly by item.
-    """
-    active_items = [i for i in queue if i.get("active", True)]
-    photo_list = []
-    for item in active_items:
-        for url in _get_image_urls(item):
-            photo_list.append((item, url))
-    random.shuffle(photo_list)
-    return active_items, photo_list
-
-
-def _upload_unpublished_photo(page_id, access_token, image_url, caption):
+def upload_unpublished_photo(page_id, access_token, file_path):
     endpoint = f"https://graph.facebook.com/{GRAPH_API_VERSION}/{page_id}/photos"
-    payload = {
-        "url": image_url,
-        "published": "false",
-        "caption": caption,
-        "access_token": access_token,
-    }
-    response = requests.post(endpoint, data=payload, timeout=30)
+    mime_type = mimetypes.guess_type(file_path)[0] or "image/jpeg"
+
+    with open(file_path, "rb") as f:
+        files = {"source": (os.path.basename(file_path), f, mime_type)}
+        data = {"published": "false", "access_token": access_token}
+        response = requests.post(endpoint, data=data, files=files, timeout=60)
+
     if response.status_code != 200:
-        print(f"Facebook API error (photo upload): {response.status_code} {response.text}", file=sys.stderr)
+        print(f"Facebook API error (photo upload - {file_path}): "
+              f"{response.status_code} {response.text}", file=sys.stderr)
         response.raise_for_status()
+
     return response.json()["id"]
 
 
-def post_all_as_one(page_id, access_token, queue):
-    active_items, photo_list = build_photo_list(queue)
+def post_photos(page_id, access_token, photos_dir):
+    photo_paths = list_photos(photos_dir)
 
-    if not photo_list:
-        return None, active_items
+    if not photo_paths:
+        return None, 0
 
-    photo_ids = []
-    for item, url in photo_list:
-        caption = generate_caption(item)
-        photo_ids.append(_upload_unpublished_photo(page_id, access_token, url, caption))
-
-    message = generate_batch_caption(active_items)
+    photo_ids = [
+        upload_unpublished_photo(page_id, access_token, path)
+        for path in photo_paths
+    ]
 
     endpoint = f"https://graph.facebook.com/{GRAPH_API_VERSION}/{page_id}/feed"
-    payload = {"message": message, "access_token": access_token}
+    payload = {"message": STATIC_CAPTION, "access_token": access_token}
     for i, photo_id in enumerate(photo_ids):
-        payload[f"attached_media[{i}]"] = json.dumps({"media_fbid": photo_id})
+        payload[f"attached_media[{i}]"] = f'{{"media_fbid":"{photo_id}"}}'
 
     response = requests.post(endpoint, data=payload, timeout=30)
     if response.status_code != 200:
         print(f"Facebook API error (feed post): {response.status_code} {response.text}", file=sys.stderr)
         response.raise_for_status()
 
-    result = response.json()
-    result["_caption_used"] = message
-    result["_photo_count"] = len(photo_ids)
-    return result, active_items
+    return response.json(), len(photo_ids)
 
 
 def main():
     page_id = os.environ.get("FB_PAGE_ID")
     access_token = os.environ.get("FB_PAGE_ACCESS_TOKEN")
+    photos_dir = os.environ.get("PHOTOS_DIR", DEFAULT_PHOTOS_DIR)
 
     if not page_id or not access_token:
         print("Missing FB_PAGE_ID or FB_PAGE_ACCESS_TOKEN environment variables.", file=sys.stderr)
         sys.exit(1)
 
-    queue = load_queue()
-    result, active_items = post_all_as_one(page_id, access_token, queue)
+    result, photo_count = post_photos(page_id, access_token, photos_dir)
 
     if result is None:
-        print("No active items with photos in the queue. Nothing to post.")
+        print(f"No image files found in {photos_dir}. Nothing to post.")
         return
 
-    print(f"Posted {result['_photo_count']} photo(s) across {len(active_items)} item(s) in one post.")
-    print(f"Post caption:\n{result['_caption_used']}\n")
-    print("Facebook API response:", {k: v for k, v in result.items() if not k.startswith("_")})
-
-    now = datetime.now(timezone.utc).isoformat()
-    for item in active_items:
-        item["last_posted_at"] = now
-        item["times_posted"] = item.get("times_posted", 0) + 1
-    save_queue(queue)
+    print(f"Posted {photo_count} photo(s) from {photos_dir} in random order.")
+    print("Facebook API response:", result)
 
 
 if __name__ == "__main__":

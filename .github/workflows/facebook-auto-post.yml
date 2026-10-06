@@ -2,12 +2,9 @@ name: Facebook Page Auto Poster
 
 on:
   schedule:
-    # Runs at the top of every hour (UTC)
+    # Runs every 23 hours (adjust the cron if you want a different cadence)
     - cron: '0 */23 * * *'
   workflow_dispatch: {}   # lets you trigger it manually from the Actions tab
-
-permissions:
-  contents: write   # needed so the workflow can commit the updated queue file
 
 jobs:
   post:
@@ -24,16 +21,8 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Post next item to Facebook Page
+      - name: Post random photos to Facebook Page
         env:
           FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
           FB_PAGE_ACCESS_TOKEN: ${{ secrets.FB_PAGE_ACCESS_TOKEN }}
         run: python scripts/post_to_facebook.py
-
-      - name: Commit updated queue state
-        run: |
-          git config user.name "fb-auto-poster-bot"
-          git config user.email "actions@users.noreply.github.com"
-          git add posts/queue.json
-          git diff --quiet --cached || git commit -m "chore: update posting queue state"
-          git push
