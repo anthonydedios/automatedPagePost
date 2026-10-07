@@ -32,7 +32,7 @@ import requests
 GRAPH_API_VERSION = "v20.0"
 STATE_PATH = "posts/rotation_state.json"
 ALLOWED_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp"}
-MAX_PHOTOS_PER_POST = 20  # Facebook's hard cap for attached_media in one feed post
+MAX_PHOTOS_PER_POST = 4  # Facebook's hard cap for attached_media in one feed post
 
 DUSTER_CAPTION = """NEW Duster Sleeve | 180 php | Freesize | Challis Korean
 
@@ -45,54 +45,41 @@ Store Locations:
 Stall 97 and 98
 
 - Binangonan Tiangge
-Stall A-10 and B-10
+Stall 19
 
 - Tanay Tiangge
 
 Delivery:
 Lalamove, LBC or J&T
 
-#taytay #tiangge #duster #taytaytianggeph #taytaytianggesupplier #ternoset #terno #ternoshorts #taytaymanufacturer #challisprinted #challis #rtw #bagpipesofinstagram #Duster"""
+#taytay #tiangge #taytaytianggeph #taytaytianggesupplier #ternoset #terno #ternoshorts #taytaymanufacturer #challisprinted #challis #rtw #bagpipesofinstagram #Duster"""
 
 TERNOSLEEVE_CAPTION = """NEW Terno | 150 php | Freesize | Challis Korean
-
 Warehouse Location:
 Tatala Binangonan Rizal (Near AlfaMart Tatala)
-
 Store Locations:
-
 - All Star Taytay Tiangge
 Stall 97 and 98
-
 - Binangonan Tiangge
-Stall A-10 and B-10
-
+Stall A-10, B-10
 - Tanay Tiangge
-
 Delivery:
 Lalamove, LBC or J&T
-
-#taytay #ternosleeves #tiangge #taytaytianggeph #taytaytianggesupplier #ternoset #terno #ternoshorts #taytaymanufacturer #challisprinted #challis #rtw #bagpipesofinstagram #Duster"""
+#taytay #tiangge #taytaytianggeph #taytaytianggesupplier #ternoset #terno #ternoshorts #taytaymanufacturer #challisprinted #challis #rtw #bagpipesofinstagram #Duster"""
 
 SMOCKDRESS_CAPTION = """NEW SMOCKED DRESS | Freesize | Challis Korean
 
 Warehouse Location:
 Tatala Binangonan Rizal (Near AlfaMart Tatala)
-
 Store Locations:
-
 - All Star Taytay Tiangge
 Stall 97 and 98
-
 - Binangonan Tiangge
-Stall A-10 and B-10
-
+Stall A-10, B-10
 - Tanay Tiangge
-
 Delivery:
 Lalamove, LBC or J&T
-
-#taytay #tiangge #smockdress #dress #taytaytianggeph #taytaytianggesupplier #ternoset #terno #ternoshorts #taytaymanufacturer #challisprinted #challis #rtw #bagpipesofinstagram #Duster"""
+#taytay #tiangge #taytaytianggeph #taytaytianggesupplier #ternoset #terno #ternoshorts #taytaymanufacturer #challisprinted #challis #rtw #bagpipesofinstagram #Duster"""
 
 # Rotation order - add/reorder entries here to change the cycle.
 PRODUCTS = [
