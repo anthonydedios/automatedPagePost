@@ -19,30 +19,6 @@ fixed caption per product.
   checkout, so without this the script would have no memory of what
   posted last).
 
-### Why only 4 photos per post
-
-Facebook's Graph API hard-caps a multi-photo feed post at **4 photos** -
-this isn't adjustable. To still get every photo in a folder shown over
-time instead of the same few repeating, each product keeps its own
-shuffled "deck" of filenames inside `posts/rotation_state.json`
-(`decks.duster`, `decks.ternosleeve`, `decks.smockdress`). Every time
-it's that product's turn, the next 4 photos come off its deck; once a
-deck runs out, it reshuffles from whatever's currently in that folder.
-So with e.g. 57 duster photos, duster's turn comes up roughly every 3
-rotations, and it takes about 14-15 of its turns to cycle through every
-photo once before any repeat.
-
-**To add another product to the rotation:** add its caption as a new
-string constant, then add `{"key": "...", "dir": "photos/your-folder",
-"caption": YOUR_CAPTION}` to the `PRODUCTS` list, in whatever position
-you want it in the cycle.
-
-**To change a caption:** edit the relevant `*_CAPTION` string directly in
-`scripts/post_to_facebook.py`.
-
-**To reset the rotation** (e.g. force the next run to post duster again):
-edit `posts/rotation_state.json` to `{"last_index": -1}` and commit.
-
 ## Setup
 
 ### 1. Get your Page ID and a long-lived Page access token
@@ -85,8 +61,6 @@ how to fix that separately.
 `scripts/generate_captions.py` is unrelated to the auto-poster above - it
 helps you write varied captions fast for manually sharing into Facebook
 Groups (which can't be automated). See that file's docstring for usage.
-
-
 
 
 GENERATE SHORT TERM TOKEN LINK
