@@ -85,3 +85,9 @@ how to fix that separately.
 `scripts/generate_captions.py` is unrelated to the auto-poster above - it
 helps you write varied captions fast for manually sharing into Facebook
 Groups (which can't be automated). See that file's docstring for usage.
+
+
+
+
+GENERATE SHORT TERM TOKEN LINK
+https://developers.facebook.com/tools/explorer/
