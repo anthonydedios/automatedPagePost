@@ -1,0 +1,33 @@
+name: Refresh Facebook Page Token
+
+on:
+  workflow_dispatch:
+    inputs:
+      short_lived_token:
+        description: "Paste a fresh short-lived User token from Graph API Explorer"
+        required: true
+        type: string
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Exchange token and update FB_PAGE_ACCESS_TOKEN secret
+        env:
+          SHORT_LIVED_TOKEN: ${{ inputs.short_lived_token }}
+          FB_APP_ID: ${{ secrets.FB_APP_ID }}
+          FB_APP_SECRET: ${{ secrets.FB_APP_SECRET }}
+          FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
+          GH_PAT: ${{ secrets.GH_PAT }}
+        run: python scripts/refresh_page_token.py
